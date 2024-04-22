@@ -3,11 +3,13 @@ package com.example.bleandroid
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,13 +25,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
 
-    private val bluetoothPermissions = arrayOf(
-        android.Manifest.permission.BLUETOOTH,
-        android.Manifest.permission.BLUETOOTH_SCAN,
-        android.Manifest.permission.BLUETOOTH_CONNECT,
-        android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-    )
+    private val bluetoothPermissions =
+        when (Build.VERSION.SDK_INT) {
+            in Build.VERSION_CODES.M.. Build.VERSION_CODES.S -> arrayOf(
+                android.Manifest.permission.BLUETOOTH,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            )
+            else -> arrayOf(
+                android.Manifest.permission.BLUETOOTH,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.BLUETOOTH_SCAN,
+                android.Manifest.permission.BLUETOOTH_CONNECT,
+            )
+        }
 
 
     override fun onRequestPermissionsResult(
@@ -108,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("ZWX ---> ", "onDeviceFound = " + devices.size)
                     runOnUiThread {
                         binding.sampleText.text =
-                            "onDeviceFound = " + devices.size
+                            "onDeviceFound = ${RustBridge().add(3,4)}" + devices.size
                         updateRecyclerView(devices);
                     }
                 }
